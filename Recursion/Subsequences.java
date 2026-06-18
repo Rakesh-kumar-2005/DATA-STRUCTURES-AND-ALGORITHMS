@@ -123,7 +123,7 @@ import java.util.ArrayList;
 public class Subsequences {
 
     private static void optimal(int idx, String ans, String s, ArrayList<String> li) {
-        // Base case
+        
         if (idx >= s.length()) {
             li.add(ans);
             return;
@@ -166,6 +166,7 @@ public class Subsequences {
     }
 
     public static void main(String[] args) {
+        
         System.out.println("╔══════════════════════════════════════════════════════════════╗");
         System.out.println("║                    SUBSEQUENCES                              ║");
         System.out.println("║  Generate all subsequences of a string                       ║");
@@ -384,6 +385,5 @@ public class Subsequences {
         System.out.println("║    • Explore all possibilities via recursion                 ║");
         System.out.println("╚══════════════════════════════════════════════════════════════╝");
     }
-
 
 }
