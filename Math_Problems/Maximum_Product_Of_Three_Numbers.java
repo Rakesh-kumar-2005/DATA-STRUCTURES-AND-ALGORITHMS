@@ -1,5 +1,93 @@
 package Math_Problems;
 
+/*
+
+    Description:
+      Following program finds the maximum product obtainable from any three elements
+        in an integer array, by sorting and evaluating exactly two candidate triplets...
+
+    Problem Statement:
+      -> Given an integer array nums of length at least 3 (may contain negatives)...
+      -> Choose any three elements from the array...
+      -> Return the maximum possible product of those three elements...
+
+    Key Insight:
+      -> After sorting, the maximum product must come from one of exactly two triplets:
+           Candidate A: nums[n-1] × nums[n-2] × nums[n-3] (three largest elements)...
+           Candidate B: nums[n-1] × nums[0] × nums[1] (largest × two smallest)...
+      -> No other combination of three elements can exceed either of these two...
+      -> Sorting exposes all four relevant boundary values in O(n log n)...
+
+    Why Only Two Candidates Suffice:
+      -> If all elements are non-negative: three largest always win (Candidate A)...
+      -> If two large negatives exist: their product is a large positive...
+           Multiplying by the largest element could dominate three positives (Candidate B)...
+      -> Any other mix (one negative, two middle positives, etc.) is always dominated
+           by either Candidate A or Candidate B...
+      -> Math.max of both candidates handles all cases without special casing...
+
+    Example:
+      -> nums = [-10, -10, 1, 3, 2]:
+           Sorted: [-10, -10, 1, 2, 3]...
+           Candidate A: 1 × 2 × 3 = 6...
+           Candidate B: (-10) × (-10) × 3 = 300...
+           Result: max(6, 300) = 300...
+      -> nums = [-5, -6, 4, 8, 9, 3]:
+           Sorted: [-6, -5, 3, 4, 8, 9]...
+           Candidate A: 4 × 8 × 9 = 288...
+           Candidate B: (-6) × (-5) × 9 = 270...
+           Result: max(288, 270) = 288...
+      -> nums = [-4, -3, -2, -1]:
+           Sorted: [-4, -3, -2, -1]...
+           Candidate A: (-2) × (-3) × (-1) = -6...
+           Candidate B: (-4) × (-3) × (-1) = -12...
+           Result: max(-6, -12) = -6 (least negative)...
+
+    Algorithm Steps:
+      -> Sort nums in ascending order...
+      -> Compute Candidate A = nums[n-1] × nums[n-2] × nums[n-3]...
+      -> Compute Candidate B = nums[n-1] × nums[0] × nums[1]...
+      -> Return Math.max(Candidate A, Candidate B)...
+
+    Step-by-Step Trace (nums = [-10, -10, 1, 2, 3]):
+      -> After sort: [-10, -10, 1, 2, 3], n=5...
+      -> Candidate A: nums[4] × nums[3] × nums[2] = 3 × 2 × 1 = 6...
+      -> Candidate B: nums[4] × nums[0] × nums[1] = 3 × (-10) × (-10) = 300...
+      -> Math.max(6, 300) = 300...
+
+    All Negatives Case:
+      -> When all elements are negative, all three-element products are negative...
+      -> Candidate A uses three values closest to zero (least negative) → maximum product...
+      -> Candidate B uses most negative × second most negative × least negative...
+           Two large negatives make a large positive, times a small negative = large negative → worse...
+      -> Math.max correctly returns Candidate A (the least negative result)...
+
+    Why Candidate B Uses nums[0] and nums[1]:
+      -> nums[0] and nums[1] are the two smallest (most negative) values after sorting...
+      -> Their product is the largest possible positive from two elements on the left side...
+      -> Multiplying by nums[n-1] (the largest element) maximizes this combination...
+      -> This is the only non-trivial candidate that could beat three positives...
+
+    Edge Cases:
+      -> Exactly three elements → both candidates evaluate to the same single triplet...
+      -> All positive → Candidate A always wins...
+      -> All negative → Candidate A (three largest = three least negative) wins...
+      -> Contains zeros → zeros dampen products; sorted correctly by both candidates...
+      -> One very large negative pair → Candidate B may dominate even large positives...
+
+    Time and Space Complexity:
+      -> Time:  O(n log n) — dominated by Arrays.sort()...
+      -> Space: O(log n) to O(n) depending on Java's sort implementation (TimSort)...
+               O(1) additional space for the two candidate variables...
+
+    Applications:
+      -> Maximum product subarray selection in competitive programming...
+      -> Financial return maximization with both gain and loss assets...
+      -> Optimal three-resource combination selection in optimization problems...
+      -> Mathematical puzzles involving maximum products of signed integers...
+
+*/
+
 import java.util.Arrays;
 
 public class Maximum_Product_Of_Three_Numbers {
@@ -12,162 +100,136 @@ public class Maximum_Product_Of_Three_Numbers {
     }
 
     public static void main(String[] args) {
+
         System.out.println("╔══════════════════════════════════════════════════════════════╗");
-        System.out.println("║              RANK TRANSFORM OF AN ARRAY                       ║");
-        System.out.println("║  Replace each element with its rank when array is sorted      ║");
-        System.out.println("║  (equal elements get the same rank)                            ║");
+        System.out.println("║          MAXIMUM PRODUCT OF THREE NUMBERS                    ║");
+        System.out.println("║  Find the largest product obtainable from any three numbers  ║");
+        System.out.println("║  in the array                                                ║");
         System.out.println("╚══════════════════════════════════════════════════════════════╝\n");
 
-        System.out.println("=== Test Case 1: Basic Array ===");
-        int[] arr1 = {40, 10, 20, 30};
-        System.out.println("Input: " + Arrays.toString(arr1));
-        System.out.println("\nSorted copy: [10, 20, 30, 40]");
-        System.out.println("Assigning ranks:");
-        System.out.println("  10 → rank 1");
-        System.out.println("  20 → rank 2");
-        System.out.println("  30 → rank 3");
-        System.out.println("  40 → rank 4");
-        System.out.println("Mapping back to original positions: [4, 1, 2, 3]\n");
+        System.out.println("=== Test Case 1: All Positive Numbers ===");
+        int[] nums1 = {1, 2, 3};
+        System.out.println("Input: " + Arrays.toString(nums1));
+        System.out.println("\nSorted: [1, 2, 3]");
+        System.out.println("Top three product: 1×2×3 = 6");
+        System.out.println("Two smallest × largest: 1×2×3 = 6");
+        System.out.println("Max of both: 6\n");
 
-        int[] result1 = maximumProduct(arr1);
-        System.out.println("✓ Result: " + Arrays.toString(result1));
-        System.out.println("  Expected: [4, 1, 2, 3]");
-        System.out.println("  Status: " + (Arrays.toString(result1).equals("[4, 1, 2, 3]") ? "PASS ✓" : "FAIL ✗") + "\n");
+        int result1 = maximumProduct(nums1);
+        System.out.println("✓ Result: " + result1);
+        System.out.println("  Expected: 6");
+        System.out.println("  Status: " + (result1 == 6 ? "PASS ✓" : "FAIL ✗") + "\n");
 
-        System.out.println("=== Test Case 2: All Duplicates ===");
-        int[] arr2 = {100, 100, 100};
-        System.out.println("Input: " + Arrays.toString(arr2));
-        System.out.println("\nSorted copy: [100, 100, 100]");
-        System.out.println("Assigning ranks:");
-        System.out.println("  100 → rank 1 (first occurrence, duplicates reuse it)");
-        System.out.println("Mapping back to original positions: [1, 1, 1]\n");
+        System.out.println("=== Test Case 2: Mix With Negatives ===");
+        int[] nums2 = {1, 2, 3, 4};
+        System.out.println("Input: " + Arrays.toString(nums2));
+        System.out.println("\nSorted: [1, 2, 3, 4]");
+        System.out.println("Top three product: 2×3×4 = 24");
+        System.out.println("Two smallest × largest: 1×2×4 = 8");
+        System.out.println("Max of both: 24\n");
 
-        int[] result2 = maximumProduct(arr2);
-        System.out.println("✓ Result: " + Arrays.toString(result2));
-        System.out.println("  Expected: [1, 1, 1]");
-        System.out.println("  Status: " + (Arrays.toString(result2).equals("[1, 1, 1]") ? "PASS ✓" : "FAIL ✗") + "\n");
+        int result2 = maximumProduct(nums2);
+        System.out.println("✓ Result: " + result2);
+        System.out.println("  Expected: 24");
+        System.out.println("  Status: " + (result2 == 24 ? "PASS ✓" : "FAIL ✗") + "\n");
 
-        System.out.println("=== Test Case 3: Mixed Duplicates ===");
-        int[] arr3 = {37, 12, 28, 9, 100, 56, 80, 5, 12};
-        System.out.println("Input: " + Arrays.toString(arr3));
-        System.out.println("\nSorted copy: [5, 9, 12, 12, 28, 37, 56, 80, 100]");
-        System.out.println("Assigning ranks:");
-        System.out.println("  5 → rank 1");
-        System.out.println("  9 → rank 2");
-        System.out.println("  12 → rank 3 (both occurrences share this rank)");
-        System.out.println("  28 → rank 4");
-        System.out.println("  37 → rank 5");
-        System.out.println("  56 → rank 6");
-        System.out.println("  80 → rank 7");
-        System.out.println("  100 → rank 8");
-        System.out.println("Mapping back to original positions: [5, 3, 4, 2, 8, 6, 7, 1, 3]\n");
+        System.out.println("=== Test Case 3: Two Large Negatives ===");
+        int[] nums3 = {- 4, - 3, - 2, - 1};
+        System.out.println("Input: " + Arrays.toString(nums3));
+        System.out.println("\nSorted: [-4, -3, -2, -1]");
+        System.out.println("Top three product: (-2)×(-3)×(-1) = -6");
+        System.out.println("Two smallest × largest: (-4)×(-3)×(-1) = -12");
+        System.out.println("Max of both: -6\n");
 
-        int[] result3 = maximumProduct(arr3);
-        System.out.println("✓ Result: " + Arrays.toString(result3));
-        System.out.println("  Expected: [5, 3, 4, 2, 8, 6, 7, 1, 3]");
-        System.out.println("  Status: " + (Arrays.toString(result3).equals("[5, 3, 4, 2, 8, 6, 7, 1, 3]") ? "PASS ✓" : "FAIL ✗") + "\n");
+        int result3 = maximumProduct(nums3);
+        System.out.println("✓ Result: " + result3);
+        System.out.println("  Expected: -6");
+        System.out.println("  Status: " + (result3 == - 6 ? "PASS ✓" : "FAIL ✗") + "\n");
 
-        System.out.println("=== Test Case 4: Single Element ===");
-        int[] arr4 = {5};
-        System.out.println("Input: " + Arrays.toString(arr4));
-        System.out.println("\nSorted copy: [5]");
-        System.out.println("Assigning ranks:");
-        System.out.println("  5 → rank 1");
-        System.out.println("Mapping back to original positions: [1]\n");
+        System.out.println("=== Test Case 4: Negatives Boosting Product ===");
+        int[] nums4 = {- 10, - 10, 1, 3, 2};
+        System.out.println("Input: " + Arrays.toString(nums4));
+        System.out.println("\nSorted: [-10, -10, 1, 2, 3]");
+        System.out.println("Top three product: 1×2×3 = 6");
+        System.out.println("Two smallest × largest: (-10)×(-10)×3 = 300");
+        System.out.println("Max of both: 300\n");
 
-        int[] result4 = maximumProduct(arr4);
-        System.out.println("✓ Result: " + Arrays.toString(result4));
-        System.out.println("  Expected: [1]");
-        System.out.println("  Status: " + (Arrays.toString(result4).equals("[1]") ? "PASS ✓" : "FAIL ✗") + "\n");
+        int result4 = maximumProduct(nums4);
+        System.out.println("✓ Result: " + result4);
+        System.out.println("  Expected: 300");
+        System.out.println("  Status: " + (result4 == 300 ? "PASS ✓" : "FAIL ✗") + "\n");
 
-        System.out.println("=== Test Case 5: Already Sorted ===");
-        int[] arr5 = {1, 2, 3, 4, 5};
-        System.out.println("Input: " + Arrays.toString(arr5));
-        System.out.println("\nSorted copy: [1, 2, 3, 4, 5]");
-        System.out.println("Assigning ranks: each element maps to its own position");
-        System.out.println("Mapping back to original positions: [1, 2, 3, 4, 5]\n");
+        System.out.println("=== Test Case 5: Minimum Size Array ===");
+        int[] nums5 = {- 1, - 2, - 3};
+        System.out.println("Input: " + Arrays.toString(nums5));
+        System.out.println("\nSorted: [-3, -2, -1]");
+        System.out.println("Only one triple possible: (-3)×(-2)×(-1) = -6");
+        System.out.println("Both formulas evaluate to the same triple\n");
 
-        int[] result5 = maximumProduct(arr5);
-        System.out.println("✓ Result: " + Arrays.toString(result5));
-        System.out.println("  Expected: [1, 2, 3, 4, 5]");
-        System.out.println("  Status: " + (Arrays.toString(result5).equals("[1, 2, 3, 4, 5]") ? "PASS ✓" : "FAIL ✗") + "\n");
+        int result5 = maximumProduct(nums5);
+        System.out.println("✓ Result: " + result5);
+        System.out.println("  Expected: -6");
+        System.out.println("  Status: " + (result5 == - 6 ? "PASS ✓" : "FAIL ✗") + "\n");
 
-        System.out.println("=== Test Case 6: Negative Numbers ===");
-        int[] arr6 = {- 5, - 3, - 1, 0, 2};
-        System.out.println("Input: " + Arrays.toString(arr6));
-        System.out.println("\nSorted copy: [-5, -3, -1, 0, 2]");
-        System.out.println("Assigning ranks:");
-        System.out.println("  -5 → rank 1");
-        System.out.println("  -3 → rank 2");
-        System.out.println("  -1 → rank 3");
-        System.out.println("  0  → rank 4");
-        System.out.println("  2  → rank 5");
-        System.out.println("Mapping back to original positions: [1, 2, 3, 4, 5]\n");
+        System.out.println("=== Test Case 6: All Zeros and Positives ===");
+        int[] nums6 = {0, 0, 0, 5, 6};
+        System.out.println("Input: " + Arrays.toString(nums6));
+        System.out.println("\nSorted: [0, 0, 0, 5, 6]");
+        System.out.println("Top three product: 0×5×6 = 0");
+        System.out.println("Two smallest × largest: 0×0×6 = 0");
+        System.out.println("Max of both: 0\n");
 
-        int[] result6 = maximumProduct(arr6);
-        System.out.println("✓ Result: " + Arrays.toString(result6));
-        System.out.println("  Expected: [1, 2, 3, 4, 5]");
-        System.out.println("  Status: " + (Arrays.toString(result6).equals("[1, 2, 3, 4, 5]") ? "PASS ✓" : "FAIL ✗") + "\n");
+        int result6 = maximumProduct(nums6);
+        System.out.println("✓ Result: " + result6);
+        System.out.println("  Expected: 0");
+        System.out.println("  Status: " + (result6 == 0 ? "PASS ✓" : "FAIL ✗") + "\n");
 
-        System.out.println("=== Test Case 7: Repeated Pairs ===");
-        int[] arr7 = {5, 3, 5, 3, 1};
-        System.out.println("Input: " + Arrays.toString(arr7));
-        System.out.println("\nSorted copy: [1, 3, 3, 5, 5]");
-        System.out.println("Assigning ranks:");
-        System.out.println("  1 → rank 1");
-        System.out.println("  3 → rank 2 (both occurrences share this rank)");
-        System.out.println("  5 → rank 3 (both occurrences share this rank)");
-        System.out.println("Mapping back to original positions: [3, 2, 3, 2, 1]\n");
+        System.out.println("=== Test Case 7: Large Mixed Array ===");
+        int[] nums7 = {- 5, - 6, 4, 8, 9, 3};
+        System.out.println("Input: " + Arrays.toString(nums7));
+        System.out.println("\nSorted: [-6, -5, 3, 4, 8, 9]");
+        System.out.println("Top three product: 4×8×9 = 288");
+        System.out.println("Two smallest × largest: (-6)×(-5)×9 = 270");
+        System.out.println("Max of both: 288\n");
 
-        int[] result7 = maximumProduct(arr7);
-        System.out.println("✓ Result: " + Arrays.toString(result7));
-        System.out.println("  Expected: [3, 2, 3, 2, 1]");
-        System.out.println("  Status: " + (Arrays.toString(result7).equals("[3, 2, 3, 2, 1]") ? "PASS ✓" : "FAIL ✗") + "\n");
+        int result7 = maximumProduct(nums7);
+        System.out.println("✓ Result: " + result7);
+        System.out.println("  Expected: 288");
+        System.out.println("  Status: " + (result7 == 288 ? "PASS ✓" : "FAIL ✗") + "\n");
 
         System.out.println("╔══════════════════════════════════════════════════════════════╗");
         System.out.println("║  ALGORITHM INSIGHTS                                          ║");
         System.out.println("║  ────────────────────────────────────────────────────────────║");
-        System.out.println("║  Problem: Replace each element with its rank in sorted order ║");
-        System.out.println("║           (equal elements → equal ranks, ranks start at 1)   ║");
+        System.out.println("║  Problem: Find the maximum product of any three numbers      ║");
+        System.out.println("║           from the array                                     ║");
         System.out.println("║                                                              ║");
-        System.out.println("║  Key Insight: Sort a Copy, Map Values → Ranks                ║");
-        System.out.println("║    Sorting reveals relative order without losing original    ║");
-        System.out.println("║    positions, since we operate on a separate copy array.     ║");
+        System.out.println("║  Key Insight: Only Two Candidate Triples Matter              ║");
+        System.out.println("║    After sorting, the best product either comes from the     ║");
+        System.out.println("║    three largest values, OR from the two smallest values     ║");
+        System.out.println("║    (which could be large negatives) times the largest value  ║");
         System.out.println("║                                                              ║");
-        System.out.println("║  Two Phases:                                                 ║");
+        System.out.println("║  Single Formula, Two Candidates:                             ║");
+        System.out.println("║    Sort the array ascending                                  ║");
+        System.out.println("║    Candidate 1: nums[n-1] × nums[n-2] × nums[n-3]            ║");
+        System.out.println("║      (three largest positive-leaning values)                 ║");
+        System.out.println("║    Candidate 2: nums[n-1] × nums[0] × nums[1]                ║");
+        System.out.println("║      (largest value × two smallest, which may be negative)   ║");
+        System.out.println("║    Return the max of the two candidates                      ║");
         System.out.println("║                                                              ║");
-        System.out.println("║  Phase 1: Build Value → Rank Map                             ║");
-        System.out.println("║    Copy and sort the array                                   ║");
-        System.out.println("║    Walk through sorted copy, assign next rank                ║");
-        System.out.println("║    only the FIRST time a value is seen                       ║");
-        System.out.println("║    (duplicates reuse the already-assigned rank)              ║");
-        System.out.println("║                                                              ║");
-        System.out.println("║  Phase 2: Rebuild Answer From Original Array                 ║");
-        System.out.println("║    For each element in the original array,                   ║");
-        System.out.println("║    look up its rank in the map                               ║");
-        System.out.println("║    Original order is preserved, values are replaced          ║");
-        System.out.println("║                                                              ║");
-        System.out.println("║  Example: arr = [37, 12, 28, 9, 100, 56, 80, 5, 12]          ║");
-        System.out.println("║                                                              ║");
-        System.out.println("║  Sorted copy:                                                ║");
-        System.out.println("║    [5, 9, 12, 12, 28, 37, 56, 80, 100]                       ║");
-        System.out.println("║                                                              ║");
-        System.out.println("║  Value → Rank Map:                                           ║");
-        System.out.println("║    5→1  9→2  12→3  28→4  37→5  56→6  80→7  100→8             ║");
-        System.out.println("║                                                              ║");
-        System.out.println("║  Rebuild using original array order:                         ║");
-        System.out.println("║    37→5, 12→3, 28→4, 9→2, 100→8, 56→6, 80→7, 5→1, 12→3       ║");
-        System.out.println("║    Result: [5, 3, 4, 2, 8, 6, 7, 1, 3]                       ║");
+        System.out.println("║  Example: nums = [-10, -10, 1, 2, 3]                         ║");
+        System.out.println("║    Candidate 1: 1×2×3 = 6                                    ║");
+        System.out.println("║    Candidate 2: (-10)×(-10)×3 = 300                          ║");
+        System.out.println("║    Result: max(6, 300) = 300                                 ║");
         System.out.println("║                                                              ║");
         System.out.println("║  Properties:                                                 ║");
-        System.out.println("║    • Ranks start at 1 and increase with no gaps              ║");
-        System.out.println("║    • Equal elements always receive equal ranks               ║");
-        System.out.println("║    • Original array order is preserved in the output         ║");
+        System.out.println("║    • Two negatives multiply to a positive, boosting product  ║");
+        System.out.println("║    • Sorting makes both candidate triples trivial to access  ║");
+        System.out.println("║    • Requires array length >= 3                              ║");
         System.out.println("║                                                              ║");
-        System.out.println("║  Time Complexity: O(n log n) for sorting + O(n) for mapping  ║");
-        System.out.println("║  Space Complexity: O(n) for copy array + HashMap             ║");
+        System.out.println("║  Time Complexity: O(n log n) for sorting                     ║");
+        System.out.println("║  Space Complexity: O(log n) to O(n) depending on sort impl   ║");
         System.out.println("╚══════════════════════════════════════════════════════════════╝");
-        
+
     }
 
 }
